@@ -38,6 +38,23 @@
             </el-form-item>
         </el-form>
     </el-card>
+      <!-- 结果区域 -->
+      <el-card>
+          <div slot="header">
+              根据筛选条件共查询到 0 条结果：
+          </div>
+          <el-table>
+              <el-table-column label="封面">
+                  <template>
+                      <el-image :src="scope.row.cover.images[0]" style="width:100px;height:75px;">
+                            <div slot="error">
+                                <img src="../../assets/image/error.gif" width="100" alt="">
+                            </div>
+                      </el-image>
+                  </template>
+              </el-table-column>
+          </el-table>
+      </el-card>
 </div>
 </template>
 
