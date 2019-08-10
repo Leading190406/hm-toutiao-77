@@ -18,14 +18,7 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="频道:">
-                <el-select v-model="reqParams.channel_id" placeholder="请选择">
-                    <el-option
-                         v-for="item in channelOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                </el-select>
+               <my-channel v-model="reqParams.channel_id"></my-channel>
             </el-form-item>
             <el-form-item label="日期:">
                 <el-date-picker
@@ -45,7 +38,7 @@
       <!-- 结果区域 -->
       <el-card>
           <div slot="header">
-              根据筛选条件共查询到 0 条结果：
+              根据筛选条件共查询到 {{total}} 条结果：
           </div>
           <el-table :data="articles">
               <el-table-column label="封面">
@@ -69,16 +62,20 @@
               </el-table-column>
               <el-table-column label="发布时间" prop="pubdate"></el-table-column>
               <el-table-column label="操作" width="120">
-                  <template >
-                      <el-button icon="el-icon-edit" plain type="primary" circle></el-button>
-                      <el-button icon="el-icon-delete" plain type="danger" circle></el-button>
+                   <template slot-scope="scope">
+                      <el-button plain type="primary" @click="edit(scope.row.id)" icon="el-icon-edit" circle></el-button>
+                      <el-button plain type="danger" @click="del(scope.row.id)" icon="el-icon-delete" circle></el-button>
                   </template>
               </el-table-column>
           </el-table>
           <div class="box">
               <el-pagination
-               background
+              background
           layout="prev, pager, next"
+          :total="total"
+          :page-size="reqParams.per_page"
+          :current-page="reqParams.page"
+          @current-change="changePager"
           ></el-pagination>
           </div>
       </el-card>
@@ -94,21 +91,43 @@ export default {
         status: null,
         channel_id: null,
         begin_pubdate: null,
-        end_pubdate: null
+        end_pubdate: null,
+        page: 1,
+        per_page: 20
       },
       // 频道下拉选项数据
-      channelOptions: [{ value: 1, label: 'js' }],
+      channelOptions: [],
 
       // 日期数据
       //   dateArr: [],
       dateValues: [],
-      articles: []
+      articles: [],
+      total: 0
     }
   },
   created () {
     this.getArticles()
   },
   methods: {
+    // 编辑函数
+    edit (id) {
+      this.$router.push('/publish?id=' + id)
+    },
+    // 删除函数
+    del (id) {
+      // 弹出确认框 点击确认后  发删除请求  响应成功更新列表即可
+      this.$confirm('亲，此操作将永久删除该文章, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        // 点击确认
+        await this.$http.delete(`articles/${id}`)
+        // 这两句代码没有执行  上面一句代码报错  没有抛出这个错误
+        this.$message.success('删除文章成功')
+        this.getArticles()
+      }).catch(() => {})
+    },
     // 搜索
     search () {
       this.getArticles()
@@ -123,10 +142,18 @@ export default {
         this.reqParams.end_pubdate = null
       }
     },
+    // 改变分页事件对应函数
+    changePager (newPage) {
+      // 修改获取数据的页码
+      this.reqParams.page = newPage
+      this.getArticles()
+    },
     // 获取文件列表数据
     async getArticles () {
       const { data: { data } } = await this.$http.get('articles', { params: this.reqParams })
       this.articles = data.results
+      // 总条数
+      this.total = data.total_count
     }
   }
 }
