@@ -16,11 +16,10 @@
 // },
 // 注意：当你清空内容的时候，值为空字符，处理成null数据。
 export default {
-  name: 'my-channel',
+  name: 'myChannel',
   props: ['value'],
   data () {
     return {
-      // myValue: null,
       channelOptions: []
     }
   },
@@ -45,4 +44,5 @@ export default {
 }
 </script>
 
-<style scoped lang='less'></style>
+<style scoped lang='less'>
+</style>

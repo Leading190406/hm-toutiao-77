@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // 封装一个插件
 // 注册所有components下的组件为全局组件
 
@@ -10,5 +11,11 @@ export default {
     // Vue 全局的vue对象
 
     Vue.component(MyChannel.name, MyChannel)
+=======
+import MyChannel from '@/components/my-channel'
+export default {
+  install (Vue) {
+    Vue.component(MyChannel.name, MyChannel.name)
+>>>>>>> f859a8dd51370d25d927426dc13389793704073c
   }
 }
