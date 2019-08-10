@@ -1,5 +1,5 @@
 <template>
-   <div class="container">
+   <div class="publish-container">
        <el-card>
            <div slot="header">
                <my-bread>发布文章</my-bread>
@@ -10,7 +10,7 @@
                    <el-input v-model="articleForm.title" style="width:400px"></el-input>
                </el-form-item>
                <el-form-item label="内容：">
-                   <quill-editor v-model="articleForm.content"></quill-editor>
+                   <quill-editor v-model="articleForm.content" :options='editorOption'></quill-editor>
                </el-form-item>
                <el-form-item label="封面：">
                    <el-radio-group v-model="articleForm.cover.type">
@@ -19,8 +19,9 @@
                        <el-radio :label="0">无图</el-radio>
                        <el-radio :label="-1">自动</el-radio>
                    </el-radio-group>
-                   <div class="img-btn">
-                       <img src='../../assets/image/default.png' alt="">
+                   <div >
+                       <my-image></my-image>
+
                    </div>
                </el-form-item>
                <el-form-item label="频道：">
@@ -54,6 +55,20 @@ export default {
           type: 1,
           images: []
         }
+      },
+      // 富文本配置
+      editorOption: {
+        placeholder: '',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'header': 1 }, { 'header': 2 }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'indent': '-1' }, { 'indent': '+1' }],
+            ['image']
+          ]
+        }
       }
     }
   }
@@ -61,14 +76,14 @@ export default {
 </script>
 
 <style scoped lang='less'>
-.img-btn {
-    width: 160px;
-    height: 160px;
-    border: 1px dashed #dddddd;
-    img{
-        width: 100%;
-        height: 100%;
-        display: block
-    }
-}
+// .img-btn {
+//     width: 160px;
+//     height: 160px;
+//     border: 1px dashed #dddddd;
+//     img{
+//         width: 100%;
+//         height: 100%;
+//         display: block
+//     }
+// }
 </style>

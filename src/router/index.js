@@ -33,7 +33,7 @@ const router = new VueRouter({
         },
         {
           path: '/publish',
-          name: 'image',
+          name: 'publish',
           component: Publish
         }
       ]
