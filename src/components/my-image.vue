@@ -2,7 +2,7 @@
     <div class="my-image">
         <!-- 图片按钮 -->
         <div class="img-btn">
-            <img src="../assets/image/default.png" @click="openDialog()" alt />
+            <img :src="value||defaultImage" @click="openDialog()" alt />
         </div>
         <!-- 对话框 -->
         <el-dialog title="选择封面" :visible.sync='dialogVisible' width="750px">
@@ -32,20 +32,34 @@
                             @current-change="changePager"
                         ></el-pagination>
                     </el-tab-pane>
-                     <el-tab-pane label="上传图片" name="upload">上传图片content</el-tab-pane>
+                     <el-tab-pane label="上传图片" name="upload">
+                       <el-upload
+                        class="avatar-uploader"
+                        action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+                        :show-file-list="false"
+                        :on-success="handleSuccess"
+                        :headers="uploadHeaders"
+                        name="image">
+                        <img v-if="uploadImageUrl" :src="uploadImageUrl" class="avatar" />
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                     </el-tab-pane>
                 </el-tabs>
 
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
-                 <el-button type="primary"  @click="dialogVisible = false">确定</el-button>
+                 <el-button type="primary"  @click="confirmImage()">确定</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
+import store from '@/store'
+import defaultImage from '../assets/image/default.png'
 export default {
   name: 'my-image',
+  props: ['value'],
   data () {
     return {
       // 控制对话框显示隐藏
@@ -61,10 +75,33 @@ export default {
         per_page: 8
       },
       images: [],
-      total: 0
+      total: 0,
+      // 上传头部
+      uploadHeaders: {
+        Authorization: `Bearer ${store.getUser().token}`
+      },
+      // 记录上传的图片地址
+      uploadImageUrl: null,
+      defaultImage
     }
   },
   methods: {
+    // 确认图片
+    confirmImage () {
+      // 让图片按钮能够显示你选中的或者上传的图片地址。
+      if (this.activeName === 'image') {
+        this.$emit('input', this.selectedImageUrl)
+      } else {
+        this.value = this.uploadImageUrl
+        this.$emit('input', this.uploadImageUrl)
+      }
+      this.dialogVisible = false
+    },
+    // 成功上传图片
+    handleSuccess (res) {
+      // 预览
+      this.uploadImageUrl = res.data.url
+    },
     // 选中图片
     selectedImage (url) {
       this.selectedImageUrl = url
@@ -79,6 +116,10 @@ export default {
     },
     openDialog () {
       this.dialogVisible = true
+      // 清空之前选中或者上传的图片地址
+      this.uploadImageUrl = null
+      this.selectedImageUrl = null
+      // 获取素材列表数据
       this.getImages()
     },
     async getImages () {
